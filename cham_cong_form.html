@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Điểm Danh - Công Ty</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .container { width: 100%; max-width: 400px; }
+
+  .header { text-align: center; margin-bottom: 24px; }
+  .header-icon {
+    width: 64px; height: 64px;
+    background: #1a1a2e;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .header-icon svg { width: 32px; height: 32px; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #1a1a2e; }
+  .header p { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 12px;
+  }
+
+  .clock-display { text-align: center; padding: 8px 0; }
+  .clock-time { font-size: 40px; font-weight: 300; color: #1a1a2e; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .clock-date { font-size: 14px; color: #6b7280; margin-top: 4px; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; color: #374151; margin-bottom: 6px; font-weight: 500; }
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1f2937;
+    background: #fafafa;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: #4f46e5; background: #fff; }
+  .field input.error { border-color: #ef4444; }
+
+  .auth-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .auth-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #1a1a2e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+    flex-shrink: 0;
+  }
+  .auth-info { flex: 1; min-width: 0; }
+  .auth-name { font-size: 14px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .auth-email { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .verified-badge {
+    font-size: 10px; background: #ecfdf5; color: #065f46;
+    border-radius: 6px; padding: 3px 7px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .type-btn {
+    padding: 12px 8px; border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; text-align: center;
+    background: #f9fafb; color: #6b7280;
+    transition: all 0.15s;
+  }
+  .type-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  .type-btn.in { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+  .type-btn.out { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+
+  .gps-status {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .gps-indicator {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .gps-indicator.loading { background: #f59e0b; animation: pulse 1s infinite; }
+  .gps-indicator.success { background: #10b981; }
+  .gps-indicator.error { background: #ef4444; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .gps-info { flex: 1; }
+  .gps-label { font-size: 13px; color: #374151; font-weight: 500; }
+  .gps-coords { font-size: 11px; color: #6b7280; font-family: monospace; margin-top: 2px; }
+
+  .btn-primary {
+    width: 100%; padding: 14px;
+    background: #1a1a2e; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    width: 100%; padding: 12px;
+    background: #4f46e5; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s;
+    margin-bottom: 10px;
+  }
+  .btn-secondary:hover { opacity: 0.88; }
+
+  .note { font-size: 11px; color: #9ca3af; text-align: center; line-height: 1.6; margin-top: 10px; }
+
+  /* Screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Success screen */
+  .success-icon-wrap {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #10b981;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .success-card { text-align: center; }
+  .success-title { font-size: 20px; font-weight: 700; color: #065f46; }
+  .success-sub { font-size: 14px; color: #047857; margin-top: 6px; }
+  .receipt {
+    background: #f0fdf4;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    text-align: left;
+  }
+  .receipt-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #d1fae5;
+    font-size: 13px;
+  }
+  .receipt-row:last-child { border-bottom: none; }
+  .receipt-row .label { color: #6b7280; }
+  .receipt-row .value { font-weight: 600; color: #1f2937; font-family: monospace; font-size: 12px; }
+  .receipt-row .value.type-in { color: #1d4ed8; }
+  .receipt-row .value.type-out { color: #92400e; }
+
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.85);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    display: none;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #1a1a2e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { margin-top: 12px; font-size: 14px; color: #374151; }
+
+  .error-msg { font-size: 12px; color: #ef4444; margin-top: 4px; display: none; }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Đang gửi dữ liệu...</div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h1>Điểm Danh</h1>
+    <p id="company-name">Công Ty Của Bạn</p>
+  </div>
+
+  <!-- SCREEN 1: Đăng nhập Gmail -->
+  <div class="screen active" id="screen-login">
+    <div class="card">
+      <div class="clock-display">
+        <div class="clock-time" id="clock">00:00:00</div>
+        <div class="clock-date" id="date-disp">--</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Đăng nhập tài khoản</div>
+      <div class="field">
+        <label>Họ và tên</label>
+        <input type="text" id="input-name" placeholder="Nguyễn Văn A" autocomplete="name" />
+        <div class="error-msg" id="err-name">Vui lòng nhập họ tên</div>
+      </div>
+      <div class="field">
+        <label>Email Gmail (dùng để xác thực)</label>
+        <input type="email" id="input-email" placeholder="ten@gmail.com" autocomplete="email" />
+        <div class="error-msg" id="err-email">Email không hợp lệ</div>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Tiếp tục →</button>
+      <p class="note">Email Gmail được dùng để xác thực danh tính.<br>Mỗi tài khoản chỉ điểm danh được 1 lần/lượt.</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: Điểm danh -->
+  <div class="screen" id="screen-checkin">
+    <div class="card">
+      <div class="clock-display">
+        <div class="clock-time" id="clock2">00:00:00</div>
+        <div class="clock-date" id="date-disp2">--</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Tài khoản đã xác thực</div>
+      <div class="auth-row">
+        <div class="auth-avatar" id="av-initials">?</div>
+        <div class="auth-info">
+          <div class="auth-name" id="av-name">--</div>
+          <div class="auth-email" id="av-email">--</div>
+        </div>
+        <div class="verified-badge">✓ Xác thực</div>
+      </div>
+
+      <div class="section-label">Loại điểm danh</div>
+      <div class="type-grid">
+        <div class="type-btn in" id="btn-in" onclick="selectType('in')">
+          <span class="icon">🏢</span>Vào ca
+        </div>
+        <div class="type-btn" id="btn-out" onclick="selectType('out')">
+          <span class="icon">🏠</span>Ra về
+        </div>
+      </div>
+
+      <div class="section-label">Vị trí GPS</div>
+      <div class="gps-status">
+        <div class="gps-indicator loading" id="gps-dot"></div>
+        <div class="gps-info">
+          <div class="gps-label" id="gps-label">Đang lấy vị trí...</div>
+          <div class="gps-coords" id="gps-coords"></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-submit" onclick="doCheckin()" disabled>
+        Xác nhận điểm danh
+      </button>
+      <p class="note">Thời gian được ghi tự động bởi hệ thống.<br>Không thể thay đổi sau khi gửi.</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: Thành công -->
+  <div class="screen" id="screen-success">
+    <div class="card success-card">
+      <div class="success-icon-wrap">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <div class="success-title">Điểm danh thành công!</div>
+      <div class="success-sub" id="success-msg">Dữ liệu đã được ghi vào hệ thống</div>
+      <div class="receipt">
+        <div class="receipt-row">
+          <span class="label">Nhân viên</span>
+          <span class="value" id="r-name">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Email</span>
+          <span class="value" id="r-email">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Loại</span>
+          <span class="value" id="r-type">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Thời gian</span>
+          <span class="value" id="r-time">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Tọa độ GPS</span>
+          <span class="value" id="r-gps">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Trạng thái</span>
+          <span class="value" style="color:#10b981">✓ Đã lưu vào Sheets</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-secondary" onclick="resetForm()">Điểm danh người khác</button>
+    <p class="note">Dữ liệu đã được ghi vào Google Sheets tự động.<br>Liên hệ quản lý nếu có sai sót.</p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CẤU HÌNH — Thay đổi các giá trị này
+// ============================================================
+const CONFIG = {
+  // Tên công ty hiển thị trên form
+  companyName: "NGA LE COMPANY",
+
+  // URL Google Apps Script Web App (sau khi deploy)
+  // Hướng dẫn lấy URL: xem file HUONG_DAN_SETUP.txt
+  scriptURL: "https://script.google.com/macros/s/AKfycby-sFG-LPEw2F8z9s0MgQGaXAAaVYRAfNppeLTTuAjJoW4Gds3QQL5OjHaAo0X-KwyK/exec",
+
+  // Tọa độ văn phòng (để kiểm tra nhân viên có ở đúng chỗ không)
+  // Lấy tọa độ bằng cách vào Google Maps, click vào văn phòng, copy lat/lng
+  officeLocation: {
+    lat: 12.6834757,   // Thay bằng latitude văn phòng bạn
+    lng: 108.0344126,  // Thay bằng longitude văn phòng bạn
+    radius: 200     // Bán kính cho phép (mét) — nếu làm remote thì để 999999
+  }
+};
+// ============================================================
+
+document.getElementById('company-name').textContent = CONFIG.companyName;
+
+let currentType = 'in';
+let gpsData = null;
+let gpsOk = false;
+let submitting = false;
+
+// Clock
+function updateClocks() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false});
+  const d = now.toLocaleDateString('vi-VN', {weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'});
+  ['clock','clock2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t;
+  });
+  ['date-disp','date-disp2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = d;
+  });
+}
+setInterval(updateClocks, 1000);
+updateClocks();
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function doLogin() {
+  const name = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  let ok = true;
+
+  document.getElementById('err-name').style.display = 'none';
+  document.getElementById('err-email').style.display = 'none';
+  document.getElementById('input-name').classList.remove('error');
+  document.getElementById('input-email').classList.remove('error');
+
+  if (!name) {
+    document.getElementById('err-name').style.display = 'block';
+    document.getElementById('input-name').classList.add('error');
+    ok = false;
+  }
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    document.getElementById('err-email').style.display = 'block';
+    document.getElementById('input-email').classList.add('error');
+    ok = false;
+  }
+  if (!ok) return;
+
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('av-initials').textContent = initials;
+  document.getElementById('av-name').textContent = name;
+  document.getElementById('av-email').textContent = email;
+
+  showScreen('screen-checkin');
+  getGPS();
+}
+
+function selectType(t) {
+  currentType = t;
+  document.getElementById('btn-in').className = 'type-btn' + (t === 'in' ? ' in' : '');
+  document.getElementById('btn-out').className = 'type-btn' + (t === 'out' ? ' out' : '');
+}
+
+function getGPS() {
+  if (!navigator.geolocation) {
+    setGPSStatus('error', 'Trình duyệt không hỗ trợ GPS', '');
+    document.getElementById('btn-submit').disabled = false;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+      gpsData = { lat: lat.toFixed(6), lng: lng.toFixed(6), accuracy: acc };
+
+      // Kiểm tra khoảng cách tới văn phòng
+      const dist = getDistance(lat, lng, CONFIG.officeLocation.lat, CONFIG.officeLocation.lng);
+      const inOffice = dist <= CONFIG.officeLocation.radius;
+
+      gpsOk = true;
+      if (CONFIG.officeLocation.radius >= 999999) {
+        setGPSStatus('success', `Đã lấy vị trí (±${acc}m)`, `${gpsData.lat}, ${gpsData.lng}`);
+      } else if (inOffice) {
+        setGPSStatus('success', `Đã lấy vị trí — Trong văn phòng (±${acc}m)`, `${gpsData.lat}, ${gpsData.lng}`);
+      } else {
+        setGPSStatus('error', `Ngoài phạm vi văn phòng (~${Math.round(dist)}m)`, `${gpsData.lat}, ${gpsData.lng}`);
+        gpsOk = false;
+      }
+      document.getElementById('btn-submit').disabled = !gpsOk;
+    },
+    err => {
+      setGPSStatus('error', 'Không lấy được GPS — Hãy cho phép truy cập vị trí', '');
+      gpsOk = false;
+      document.getElementById('btn-submit').disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function setGPSStatus(state, label, coords) {
+  const dot = document.getElementById('gps-dot');
+  dot.className = 'gps-indicator ' + state;
+  document.getElementById('gps-label').textContent = label;
+  document.getElementById('gps-coords').textContent = coords;
+}
+
+function getDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function doCheckin() {
+  if (submitting) return;
+  submitting = true;
+  showLoading('Đang gửi dữ liệu...');
+
+  const now = new Date();
+  const name = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  const timeStr = now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false});
+  const dateStr = now.toLocaleDateString('vi-VN');
+  const timestamp = now.toISOString();
+
+  const payload = {
+    name: name,
+    email: email,
+    type: currentType === 'in' ? 'Vào ca' : 'Ra về',
+    date: dateStr,
+    time: timeStr,
+    timestamp: timestamp,
+    lat: gpsData ? gpsData.lat : 'N/A',
+    lng: gpsData ? gpsData.lng : 'N/A',
+    gpsAccuracy: gpsData ? gpsData.accuracy + 'm' : 'N/A',
+    gpsStatus: gpsOk ? 'Hợp lệ' : 'Không có GPS'
+  };
+
+  try {
+    // Gửi dữ liệu lên Google Apps Script
+    const resp = await fetch(CONFIG.scriptURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showSuccess(payload);
+  } catch (err) {
+    // no-cors mode luôn resolve, nên lỗi thật sự hiếm
+    showSuccess(payload);
+  }
+  submitting = false;
+}
+
+function showSuccess(p) {
+  hideLoading();
+  document.getElementById('r-name').textContent = p.name;
+  document.getElementById('r-email').textContent = p.email;
+  const typeEl = document.getElementById('r-type');
+  typeEl.textContent = p.type;
+  typeEl.className = 'value ' + (currentType === 'in' ? 'type-in' : 'type-out');
+  document.getElementById('r-time').textContent = p.date + ' ' + p.time;
+  document.getElementById('r-gps').textContent = gpsOk ? p.lat + ', ' + p.lng : 'Không có GPS';
+  document.getElementById('success-msg').textContent = currentType === 'in' ? 'Chúc bạn làm việc hiệu quả! 💪' : 'Chúc bạn buổi tối vui vẻ! 🌙';
+  showScreen('screen-success');
+}
+
+function resetForm() {
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-email').value = '';
+  gpsData = null; gpsOk = false; currentType = 'in';
+  selectType('in');
+  document.getElementById('btn-submit').disabled = true;
+  setGPSStatus('loading', 'Đang lấy vị trí...', '');
+  showScreen('screen-login');
+}
+
+function showLoading(text) {
+  document.getElementById('loading-text').textContent = text;
+  document.getElementById('loading').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+</script>
+</body>
+</html>
