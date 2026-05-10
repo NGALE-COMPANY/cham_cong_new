@@ -346,7 +346,7 @@ const CONFIG = {
 
   // URL Google Apps Script Web App (sau khi deploy)
   // Hướng dẫn lấy URL: xem file HUONG_DAN_SETUP.txt
-  scriptURL: "https://script.google.com/macros/s/AKfycbz7ENj8ACd5otEz9_WdiaqVlWvgwh5mZjOHZy4X5wXg8hhBTrkaJRNHydb4DuVG6bpGxA/exec",
+  scriptURL: "https://script.google.com/macros/s/AKfycbwmqthDUaFXoUVk70G8Tmf4NOd8t2yEAmdYCiM8rnEgQDHYpA-Cion5hsiWcszsRSbOvg/exec",
 
   // Tọa độ văn phòng (để kiểm tra nhân viên có ở đúng chỗ không)
   // Lấy tọa độ bằng cách vào Google Maps, click vào văn phòng, copy lat/lng
@@ -503,16 +503,18 @@ async function doCheckin() {
   };
 
   try {
-    // Gửi dữ liệu lên Google Apps Script
+    // Gửi dữ liệu lên Google Apps Script qua URL params (tránh CORS)
+    const params = new URLSearchParams();
+    params.append('data', JSON.stringify(payload));
+
     const resp = await fetch(CONFIG.scriptURL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
     });
     showSuccess(payload);
   } catch (err) {
-    // no-cors mode luôn resolve, nên lỗi thật sự hiếm
     showSuccess(payload);
   }
   submitting = false;
